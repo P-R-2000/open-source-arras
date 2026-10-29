@@ -128,6 +128,7 @@ class socketManager {
     }
 
     close(socket) {
+        socket.closed = true;
     // Figure out who the player was
         let player = socket.player,
             index = this.players.indexOf(player);
@@ -225,9 +226,10 @@ class socketManager {
                 }
             } break;
             case "s": { // spawn request
-                if (!socket.status.deceased) {
+                if (socket.status.spawning || !socket.status.deceased) {
                     socket.kick("Trying to spawn while already alive."); return 1; 
                 }
+                socket.status.spawning = true;
                 if (global.gameManager.private && !socket.permissions) {
                     return (
                         socket.talk("message", "This server seems to be private."),
@@ -299,6 +301,7 @@ class socketManager {
 
                 // Give it the room state and move the camera.
                 if (needsRoom) {
+                    socket.status.spawning = false;
                     if (Config.hidden) return socket.close(); // If the server is hidden then just kick the client.
                     this.newPlayer(socket);
                     socket.talk(
@@ -324,7 +327,7 @@ class socketManager {
                 }
                 let loop = setInterval(() => {
                     // You can put your code here to prevent players from spawning.
-                    if (!global.cannotRespawn && !global.gameManager.arenaClosed && socket.status.readyToSpawn) {
+                    if (!global.cannotRespawn && !global.gameManager.arenaClosed && socket.status.readyToSpawn && !socket.closed) {
                         clearInterval(loop);
                         let epackage = {};
                         epackage.name = name;
@@ -336,6 +339,7 @@ class socketManager {
                             epackage.braindamagemode = true;
                         }
                         this.initalizePlayer(epackage, socket);
+                        socket.status.spawning = false;
                     }
                 }, 20)
             } break;
@@ -2144,6 +2148,7 @@ class socketManager {
         socket.status = {
             verified: false,
             receiving: 0,
+            spawning: false,
             deceased: true,
             requests: 0,
             hasSpawned: false,
