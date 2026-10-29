@@ -196,10 +196,6 @@ class socketManager {
             socket.kick("Malformed packet.");
             return 1;
         }
-        // Handle the request
-        if (socket.resolveResponse(m[0], m)) {
-            return;
-        }
         switch (m.shift()) {
             case "k": { // key verification
                 if (m.length > 1) {
@@ -2143,24 +2139,6 @@ class socketManager {
             stop: () => {
                 timer = 0;
             }
-        };
-        socket.awaiting = {};
-        socket.awaitResponse = function(options, callback) {
-            socket.awaiting[options.packet] = {
-                callback: callback,
-                timeout: setTimeout(() => {
-                    console.log("Socket did not respond to the eval packet, kicking...");
-                    socket.kick("Did not comply with the server's protocol.");
-                }, options.timeout)
-            };
-        };
-        socket.resolveResponse = function(id, packet) {
-            if (socket.awaiting[id]) {
-                clearTimeout(socket.awaiting[id].timeout);
-                socket.awaiting[id].callback(packet);
-                return true;
-            }
-            return false;
         };
         // Set up the status container
         socket.status = {
