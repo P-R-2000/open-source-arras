@@ -196,7 +196,8 @@ class socketManager {
             socket.kick("Malformed packet.");
             return 1;
         }
-        switch (m.shift()) {
+        const packetType = m.shift();
+        switch (packetType) {
             case "k": { // key verification
                 if (m.length > 1) {
                     socket.kick("Ill-sized key request."); return 1; 
@@ -754,8 +755,7 @@ class socketManager {
                 socket.status.forceNewBroadcast = true;
             } break;
             default: {
-                console.log(m)
-                console.log("Invalid registered packet." + m);
+                console.log("Unknown packet type: " + packetType);
             } break;
         }
     };
