@@ -188,6 +188,7 @@ class socketManager {
         util.log("[INFO]: The connection has closed. Views: " + global.gameManager.views.length + ". Clients: " + this.clients.length + ".");
     }
     incoming(message, socket) {
+        socket.status.requests++;
     // Decode it
         let m = protocol.decode(message);
         // Remember who we are
