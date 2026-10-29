@@ -482,7 +482,7 @@ class socketManager {
                     return;
                 }
                 // Verify the request
-                if (typeof upgrade != "number" || upgrade < 0 || typeof branchId != "number" || !isFinite(branchId) || branchId < 0) {
+                if (typeof upgrade != "number" || upgrade < 0 || upgrade >= player.body.upgrades.length || typeof branchId != "number" || !isFinite(branchId) || branchId < 0) {
                     socket.kick("Bad upgrade request.");
                     return 1;
                 }
